@@ -1,1 +1,3 @@
-
+#include <stdio.h>
+printf"Hello Wrold";
+return 0
