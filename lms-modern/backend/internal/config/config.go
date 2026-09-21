@@ -14,7 +14,7 @@ type Config struct {
 }
 
 // appDir 返回可执行文件（或开发时项目）所在目录，保证数据库与程序同目录、便于便携。
-func appDir() {
+func appDir() string {
 	if exe, err := os.Executable(); err == nil {
 		return path.Dir(exe)
 	}
@@ -38,6 +38,4 @@ func Load() *Config {
 	return &Config{
 		Addr:        addr,
 		DBPath:      dbPath,
-		TokenSecret: []byte(secret),
-	}
-}
+		TokenSecret: []byte(seline)
