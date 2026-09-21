@@ -1,0 +1,10 @@
+import hashlib
+loc=open(r"C:\Users\Lenovo\Desktop\PJ\lms-modern\backend\internal\config\config.go","rb").read()
+def sh(d): return hashlib.sha1(b"blob %d\0"%len(d)+d).hexdigest()
+print("len",len(loc),"CRLF",loc.count(b"\r\n"),"LF",loc.count(b"\n"),"last8",loc[-8:])
+print("as-is        ",sh(loc))
+print("LF->CRLF     ",sh(loc.replace(b"\n",b"\r\n")))
+print("strip trailNL",sh(loc.rstrip(b"\n")))
+print("add one NL   ",sh(loc+b"\n"))
+print("CRLF then strip",sh(loc.replace(b"\n",b"\r\n").rstrip(b"\r\n")))
+print("REMOTE = ca57bad9d61c9deea1ecc359ced474ff52c2bf15")

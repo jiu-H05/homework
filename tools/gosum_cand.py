@@ -1,0 +1,10 @@
+import hashlib
+loc=open(r"C:\Users\Lenovo\Desktop\PJ\lms-modern\backend\go.sum","rb").read()
+def sh(d): return hashlib.sha1(b"blob %d\0"%len(d)+d).hexdigest()
+print("len",len(loc),"CRLF",loc.count(b"\r\n"),"LF",loc.count(b"\n"),"last6",loc[-6:])
+print("as-is       ",sh(loc))
+print("LF->CRLF    ",sh(loc.replace(b"\n",b"\r\n")))
+print("stripNL     ",sh(loc.rstrip(b"\n")))
+print("CRLF strip  ",sh(loc.replace(b"\n",b"\r\n").rstrip(b"\r\n")))
+print("REMOTE 92a8395607681549d7ca3bc95149c21e21fb6b04")
+print("TARGET 634130791fd9525165af68998897b9293ebb5119")
