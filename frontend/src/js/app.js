@@ -132,6 +132,20 @@ function buildShell() {
     b.addEventListener("click", () => route(b.dataset.id))
   );
 
+  // 移动端底部 Tab：独立一套结构，图标在上、文字在下
+  const mNav = document.getElementById("mobile-nav");
+  mNav.innerHTML = items
+    .map(
+      (it) => `
+    <button class="mnav-item" data-id="${it.id}" type="button">
+      <span class="mnav-ico">${it.ico}</span><span class="mnav-label">${it.title}</span>
+    </button>`
+    )
+    .join("");
+  mNav.querySelectorAll(".mnav-item").forEach((b) =>
+    b.addEventListener("click", () => route(b.dataset.id))
+  );
+
   const roleText = currentUser.role === "admin" ? "管理员" : "读者";
   document.getElementById("user-chip").innerHTML = `
     <span class="uc-name">${currentUser.realName || currentUser.username}</span>
@@ -144,6 +158,9 @@ async function route(id) {
   if (!item) return;
   currentNav = id;
   document.querySelectorAll(".nav-item").forEach((b) =>
+    b.classList.toggle("active", b.dataset.id === id)
+  );
+  document.querySelectorAll(".mnav-item").forEach((b) =>
     b.classList.toggle("active", b.dataset.id === id)
   );
   document.getElementById("page-title").textContent = item.title;
