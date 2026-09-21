@@ -1,5 +1,0 @@
-# 运行时仅使用 Python 3.10+ 标准库（tkinter、sqlite3、hashlib），无需安装第三方包。
-# 打包 Windows .exe 需要 PyInstaller：
-pyinstaller>=6.0
-# 生成应用图标 .ico 需要 Pillow（可选）：
-pillow>=10.0
