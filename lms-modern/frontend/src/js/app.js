@@ -82,7 +82,9 @@ function showLogin() {
   document.getElementById("app-root").classList.add("hidden");
   const lr = document.getElementById("login-root");
   lr.classList.remove("hidden");
-  renderLogin(async () => {
+  renderLogin(async (data) => {
+    // 必须先保存登录返回的令牌，后续 /api/auth/me 等请求才会带 Authorization。
+    setToken(data.token);
     await enterApp();
   });
 }
@@ -180,7 +182,7 @@ function wireGlobal() {
     setToken(null);
     currentUser = null;
     showLogin();
-  });
+  })
   document.getElementById("btn-password").addEventListener("click", openPasswordModal);
 }
 
