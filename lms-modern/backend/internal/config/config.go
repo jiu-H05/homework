@@ -36,6 +36,8 @@ func Load() *Config {
 		secret = "lms-local-default-secret-change-me"
 	}
 	return &Config{
-		Addr:        addr,
-		DBPath:      dbPath,
-		TokenSecret: []byte(seline)
+		Addr:       addr,
+		DBPath:     dbPath,
+		TokenSecret: []byte(secret),
+	}
+}
