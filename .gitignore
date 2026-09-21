@@ -1,0 +1,26 @@
+# 构建产物
+**/target/
+**/node_modules/
+frontend/src-tauri/gen/
+frontend/dist/
+
+# 运行时数据
+standalone/*.db
+standalone/*.db-*
+*.db
+*.db-wal
+*.db-shm
+
+# 大二进制与发布产物
+tools/cloudflared.exe
+tools/lms-server.exe
+tools/landing/downloads/
+tools/landing/logo.png
+
+# 临时
+*.log
+.DS_Store
+Thumbs.db
+.env
+
+tools/cargotest/

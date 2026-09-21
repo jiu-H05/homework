@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>图书管理系统 · 下载与介绍</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
+    --accent: #3b82f6; --accent2: #10b981;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #0f172a 0%, #1e293b 100%);
+    color: var(--text); min-height: 100vh; line-height: 1.6;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 48px 24px; }
+  header { text-align: center; margin-bottom: 40px; }
+  .logo {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 72px; height: 72px; border-radius: 18px;
+    background: var(--accent); font-size: 36px; margin-bottom: 20px;
+  }
+  h1 { font-size: 36px; margin-bottom: 10px; }
+  .tag { color: var(--muted); font-size: 17px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin: 32px 0; }
+  .card {
+    background: var(--card); border-radius: 14px; padding: 22px;
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  .card h3 { font-size: 16px; margin-bottom: 6px; color: var(--accent2); }
+  .card p { color: var(--muted); font-size: 14px; }
+  .section-title { margin: 40px 0 14px; font-size: 18px; }
+  .downloads { display: flex; flex-direction: column; gap: 14px; }
+  .dl {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    background: var(--card); border-radius: 14px; padding: 18px 22px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .dl .meta b { font-size: 16px; }
+  .dl .meta span { display: block; color: var(--muted); font-size: 13px; }
+  .btn {
+    background: var(--accent); color: #fff; text-decoration: none;
+    padding: 10px 20px; border-radius: 8px; font-weight: 600; white-space: nowrap;
+    display: inline-block;
+  }
+  .btn:hover { background: #2563eb; }
+  .btn.ghost { background: transparent; border: 1px solid var(--muted); color: var(--muted); }
+  .soon { color: var(--muted); font-size: 13px; }
+  .note { background: var(--card); border-radius: 14px; padding: 18px 22px; color: var(--muted); font-size: 14px; border: 1px solid rgba(255,255,255,.06); }
+  footer { text-align: center; margin-top: 48px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><img src="logo.png" alt="logo" style="width:100%;height:100%;object-fit:cover" /></div>
+    <h1>图书管理系统</h1>
+    <p class="tag">前后端分离 · 多端可用 · 多人共用同一馆藏</p>
+  </header>
+
+  <div class="grid">
+    <div class="card"><h3>📚 馆藏管理</h3><p>书目、分类与地区检索，借阅、归还、续借全流程。</p></div>
+    <div class="card"><h3>👥 多角色</h3><p>管理员维护书目与读者，读者自助查馆藏、借还。</p></div>
+    <div class="card"><h3>🌐 公网访问</h3><p>后端经 Cloudflare Tunnel 发布，多端直连同一服务。</p></div>
+    <div class="card"><h3>💾 应用内备份</h3><p>控制台一键导出/导入数据库，换机无需手动找文件。</p></div>
+  </div>
+
+  <h2 class="section-title">客户端下载</h2>
+  <div class="downloads">
+    <div class="dl">
+      <div class="meta">
+        <b>Windows 桌面端</b>
+        <span>Windows 10/11 x64 · 瘦客户端，装完填服务器地址即可</span>
+      </div>
+      <a class="btn" href="downloads/图书管理系统-setup.exe" download>下载 Windows 版</a>
+    </div>
+    <div class="dl">
+      <div class="meta">
+        <b>Android 移动端</b>
+        <span>安卓手机 / 平板 · APK</span>
+      </div>
+      <a class="btn" href="downloads/lms.apk" download>下载 Android APK</a>
+    </div>
+    <div class="dl">
+      <div class="meta">
+        <b>macOS / Linux</b>
+        <span>需在对应系统上用源码构建（本发行未提供预编译包）</span>
+      </div>
+      <span class="soon">需自行构建</span>
+    </div>
+    <div class="dl">
+      <div class="meta">
+        <b>网页版</b>
+        <span>无需安装，浏览器直接访问后端公网地址</span>
+      </div>
+      <a class="btn ghost" id="web-link" href="#">打开网页版</a>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:24px">
+    安装后首次启动会要求填写服务器地址，即本系统后端的公网地址（管理员提供）。
+  </div>
+
+  <footer>
+    本系统由本机后端经 Cloudflare Tunnel 提供服务
+  </footer>
+</div>
+<script>
+  document.getElementById("web-link").href = "https://mix-essay-oem-weed.trycloudflare.com";
+</script>
+</body>
+</html>
