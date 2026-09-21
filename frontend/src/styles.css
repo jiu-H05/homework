@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #f4f6fa;
   --surface: #ffffff;
   --sidebar-bg: #10233f;
@@ -183,8 +183,8 @@ table.data tr:hover td { background: #f8fafd; }
 .desc-list dt { color: var(--text-muted); }
 .desc-list dd { margin: 0; }
 
-/* ---------- 移动端：侧边栏变底部 Tab 栏 ---------- */
-@media (max-width: 768px) {
+/* ---------- 绉诲姩绔細渚ц竟鏍忓彉搴曢儴 Tab 鏍?---------- */
+@media (max-width: 900px) {
   .app-root { flex-direction: column; }
   .sidebar {
     position: fixed; left: 0; right: 0; bottom: 0; top: auto;
@@ -217,7 +217,7 @@ table.data tr:hover td { background: #f8fafd; }
   .form-row { flex-direction: column; gap: 0; }
 }
 
-/* ================= Apple Glass 现代风格覆盖 ================= */
+/* ================= Apple Glass 鐜颁唬椋庢牸瑕嗙洊 ================= */
 :root {
   --radius: 16px;
   --glass: rgba(255, 255, 255, 0.65);
@@ -235,7 +235,7 @@ body {
   background-attachment: fixed;
 }
 
-/* 卡片 / 统计：磨砂玻璃 */
+/* 鍗＄墖 / 缁熻锛氱（鐮傜幓鐠?*/
 .card, .stat-card {
   background: var(--glass) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -245,7 +245,7 @@ body {
   box-shadow: var(--shadow);
 }
 
-/* 顶栏：玻璃 */
+/* 椤舵爮锛氱幓鐠?*/
 .topbar {
   background: var(--glass-strong) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -253,7 +253,7 @@ body {
   border-bottom: 1px solid var(--glass-border) !important;
 }
 
-/* 侧边栏：深色玻璃 */
+/* 渚ц竟鏍忥細娣辫壊鐜荤拑 */
 .sidebar {
   background: rgba(20, 35, 66, 0.55) !important;
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -261,7 +261,7 @@ body {
 }
 .nav-item.active { background: rgba(255,255,255,0.18) !important; }
 
-/* 登录页：彩色渐变 + 玻璃卡片 */
+/* 鐧诲綍椤碉細褰╄壊娓愬彉 + 鐜荤拑鍗＄墖 */
 .login-root {
   background: linear-gradient(135deg, #6a8cff 0%, #9f7aea 50%, #f472b6 100%) !important;
 }
@@ -274,14 +274,14 @@ body {
   box-shadow: 0 24px 60px rgba(80, 40, 120, 0.25);
 }
 
-/* 输入框：圆角柔和 */
+/* 杈撳叆妗嗭細鍦嗚鏌斿拰 */
 .input, select.input, textarea.input {
   border-radius: 10px;
   background: rgba(255,255,255,0.8);
 }
 .input:focus { box-shadow: 0 0 0 4px rgba(106, 140, 255, 0.18); }
 
-/* 按钮：更大圆角 + 渐变 */
+/* 鎸夐挳锛氭洿澶у渾瑙?+ 娓愬彉 */
 .btn { border-radius: 12px; font-weight: 500; }
 .btn-primary {
   background: linear-gradient(135deg, #5b8cff 0%, #7c5cff 100%);
@@ -290,29 +290,78 @@ body {
 .btn-primary:hover { filter: brightness(1.05); }
 .btn-danger { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
 
-/* 表格容器：玻璃 */
+/* 琛ㄦ牸瀹瑰櫒锛氱幓鐠?*/
 .table-wrap, .data { border-radius: 12px; }
 .data thead th { background: rgba(255,255,255,0.5); }
 
-/* Modal：玻璃 */
+/* Modal锛氱幓鐠?*/
 .modal-body, .modal-header, .modal-footer {
   background: rgba(255,255,255,0.85);
   -webkit-backdrop-filter: blur(28px);
   backdrop-filter: blur(28px);
 }
 
-/* Toast：玻璃 */
+/* Toast锛氱幓鐠?*/
 .toast { background: rgba(255,255,255,0.82) !important; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
 
-/* 移动端底部栏：玻璃 */
-@media (max-width: 768px) {
+/* 绉诲姩绔簳閮ㄦ爮锛氱幓鐠?*/
+@media (max-width: 900px) {
   .sidebar { background: rgba(255,255,255,0.8) !important; color: var(--text) !important; }
   .nav-item { color: var(--text-muted); }
   .nav-item.active { color: var(--primary) !important; }
 }
 
-/* 统一品牌 Logo 图 */
+/* 缁熶竴鍝佺墝 Logo 鍥?*/
 .login-logo, .brand-logo {
   background: url("./assets/logo.png") no-repeat center/cover, var(--primary);
   box-shadow: 0 8px 20px rgba(91,140,255,0.35);
+}
+
+
+/* 移动端保险：竖屏窄屏一律底部 Tab */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+  .app-root { flex-direction: column !important; }
+  .sidebar { position: fixed !important; left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important; width: 100% !important; height: auto !important; flex-direction: row !important; }
+  .sidebar .brand, .sidebar-footer { display: none !important; }
+  .nav { flex-direction: row !important; height: 56px !important; }
+  .nav-item { flex: 1 !important; flex-direction: column !important; font-size: 11px !important; }
+  .main { padding-bottom: 56px !important; }
+}
+
+/* ============ 独立移动端底部导航（不再改桌面侧边栏） ============ */
+.mobile-nav { display: none; }
+
+@media (max-width: 768px) {
+  /* 桌面侧边栏完全隐藏 */
+  .sidebar { display: none !important; }
+  .app-root { flex-direction: column; }
+
+  /* 移动端底部 Tab 独立结构 */
+  .mobile-nav {
+    display: flex;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    height: 60px;
+    background: rgba(255,255,255,0.85);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.06);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .mnav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; background: none; border: none; cursor: pointer;
+    color: #8a94a6; font-size: 11px; font-family: inherit;
+  }
+  .mnav-ico { font-size: 20px; line-height: 1; }
+  .mnav-item.active { color: var(--primary); font-weight: 600; }
+
+  .main { padding-bottom: 60px; }
+  .topbar { padding: 10px 14px; }
+  .view { padding: 14px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar .input, .toolbar select { width: 100%; min-width: 0; }
+  .toolbar .spacer { display: none; }
+  .table-wrap { overflow-x: auto; }
+  .data { min-width: 600px; }
+  .toast-root { left: 12px; right: 12px; bottom: 76px; top: auto; }
+  .form-row { flex-direction: column; gap: 0; }
 }
