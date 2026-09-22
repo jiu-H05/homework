@@ -31,12 +31,12 @@ async function loadAll() {
     await load(name, path);
   }
 }
-let api, setToken, getToken, getBase, resolveApiBase, isTauri, invalidateCache;
+let api, setToken, getToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl;
 let lmsFetch, renderLogin, openModal, toast, formValues;
 let renderDashboard, renderBooks, renderReaders, renderBorrows, renderLogs;
 let renderCatalog, renderMyBorrows, renderProfile, renderServerSetup;
 function wireRefs() {
-  ({ api, setToken, getToken, getBase, resolveApiBase, isTauri, invalidateCache } = MOD.api);
+  ({ api, setToken, getToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl } = MOD.api);
   ({ lmsFetch } = MOD.net);
   ({ renderServerSetup } = MOD.setup);
   ({ renderLogin } = MOD.login);
@@ -70,7 +70,7 @@ let currentUser = null;
 let currentNav = null;
 
 async function waitForBackend() {
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 10; i++) {
     try {
       const r = await lmsFetch(getBase() + "/api/health");
       if (r.ok) return true;
@@ -82,7 +82,25 @@ async function waitForBackend() {
       await new Promise((r) => setTimeout(r, 500));
     }
   }
+  showServerSetupOnBoot();
   return false;
+}
+
+function showServerSetupOnBoot() {
+  const boot = document.getElementById("boot");
+  boot.innerHTML = `
+    <div style="max-width:420px;text-align:center;padding:20px">
+      <p style="margin-bottom:12px">连不上服务器，请填写后端地址</p>
+      <input id="boot-url" class="input" placeholder="https://xxx.trycloudflare.com" style="margin-bottom:12px" />
+      <button id="boot-save" class="btn btn-primary btn-block">连接</button>
+    </div>`;
+  document.getElementById("boot-save").onclick = async () => {
+    const url = document.getElementById("boot-url").value.trim();
+    if (!url) return;
+    setServerUrl(url);
+    const ok = await waitForBackend();
+    if (ok) { if (getToken()) await enterApp(); else showLogin(); }
+  };
 }
 
 function showLogin() {
@@ -232,8 +250,7 @@ async function bootstrap() {
   }
   const ready = await waitForBackend();
   if (!ready) {
-    document.getElementById("boot").innerHTML =
-      `<p style="color:var(--danger)">后端服务未能启动，请重新打开应用。</p>`;
+    // waitForBackend 失败后已显示服务器输入框，这里不再覆盖
     return;
   }
   if (getToken()) await enterApp();
