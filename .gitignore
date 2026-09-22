@@ -24,3 +24,7 @@ Thumbs.db
 .env
 
 tools/cargotest/
+
+# Rust 编译缓存
+tools/rustctest/
+
