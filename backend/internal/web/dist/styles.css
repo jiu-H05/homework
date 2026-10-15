@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #f4f6fa;
   --surface: #ffffff;
   --sidebar-bg: #10233f;
@@ -15,6 +15,49 @@
   --shadow: 0 1px 3px rgba(16, 35, 63, 0.08), 0 1px 2px rgba(16, 35, 63, 0.04);
   font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", Helvetica, Arial, sans-serif;
 }
+
+/* 暗色主题：body.dark 时整体反相 */
+body.dark {
+  --bg: #0f1419;
+  --surface: #1a2029;
+  --sidebar-bg: #0a1526;
+  --sidebar-active: #16294a;
+  --primary: #4a9fd8;
+  --primary-dark: #3a8bc2;
+  --text: #e4e8ee;
+  --text-muted: #8b96a5;
+  --border: #2a323d;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* 到期提醒黄条 */
+.due-banner {
+  background: #fff7e0;
+  border: 1px solid #f0d080;
+  border-left: 4px solid var(--warning);
+  color: #7a5510;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+body.dark .due-banner {
+  background: #2a2410;
+  border-color: #6b5520;
+  color: #f0d080;
+}
+
+/* 饼图与趋势图 */
+.pie-wrap { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.pie {
+  width: 160px; height: 160px; border-radius: 50%;
+  flex-shrink: 0; box-shadow: var(--shadow);
+}
+.pie-legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.pie-legend-item { display: flex; align-items: center; gap: 6px; }
+.pie-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.trend-svg { width: 100%; height: auto; }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -182,3 +225,186 @@ table.data tr:hover td { background: #f8fafd; }
 .desc-list { display: grid; grid-template-columns: 110px 1fr; gap: 10px 14px; font-size: 14px; }
 .desc-list dt { color: var(--text-muted); }
 .desc-list dd { margin: 0; }
+
+/* ---------- 绉诲姩绔細渚ц竟鏍忓彉搴曢儴 Tab 鏍?---------- */
+@media (max-width: 900px) {
+  .app-root { flex-direction: column; }
+  .sidebar {
+    position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+    width: 100%; height: auto; z-index: 50;
+    flex-direction: row; align-items: stretch;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar .brand, .sidebar-footer { display: none; }
+  .nav { display: flex; flex-direction: row; padding: 0; height: 58px; overflow-x: auto; }
+  .nav-item {
+    flex: 1; flex-direction: column; justify-content: center; gap: 3px;
+    padding: 6px 4px; border-radius: 0; font-size: 11px; text-align: center; white-space: nowrap;
+  }
+  .nav-item .nav-ico { width: auto; font-size: 18px; }
+  .main { padding-bottom: 58px; }
+  .topbar { padding: 12px 14px; }
+  .topbar .btn { padding: 6px 10px; font-size: 12px; }
+  .view { padding: 14px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar .input { width: 100%; min-width: 0; }
+  .toolbar select { width: 100%; }
+  .toolbar .spacer { display: none; }
+  .table-wrap { overflow-x: auto; }
+  .data { min-width: 640px; }
+  .stat-card .stat-value { font-size: 22px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .toast-root { left: 12px; right: 12px; top: auto; bottom: 70px; }
+  .toast { min-width: 0; }
+  .modal-body { padding: 14px; }
+  .form-row { flex-direction: column; gap: 0; }
+}
+
+/* ================= Apple Glass 鐜颁唬椋庢牸瑕嗙洊 ================= */
+:root {
+  --radius: 16px;
+  --glass: rgba(255, 255, 255, 0.65);
+  --glass-strong: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --shadow: 0 8px 32px rgba(31, 60, 120, 0.10);
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #c7e0ff 0%, transparent 60%),
+    radial-gradient(1000px 500px at 110% 10%, #ffd6e7 0%, transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, #d6f5e3 0%, transparent 60%),
+    linear-gradient(160deg, #eef2f9 0%, #e8edf6 100%);
+  background-attachment: fixed;
+}
+
+/* 鍗＄墖 / 缁熻锛氱（鐮傜幓鐠?*/
+.card, .stat-card {
+  background: var(--glass) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* 椤舵爮锛氱幓鐠?*/
+.topbar {
+  background: var(--glass-strong) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* 渚ц竟鏍忥細娣辫壊鐜荤拑 */
+.sidebar {
+  background: rgba(20, 35, 66, 0.55) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+}
+.nav-item.active { background: rgba(255,255,255,0.18) !important; }
+
+/* 鐧诲綍椤碉細褰╄壊娓愬彉 + 鐜荤拑鍗＄墖 */
+.login-root {
+  background: linear-gradient(135deg, #6a8cff 0%, #9f7aea 50%, #f472b6 100%) !important;
+}
+.login-card {
+  background: rgba(255,255,255,0.72) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 22px;
+  box-shadow: 0 24px 60px rgba(80, 40, 120, 0.25);
+}
+
+/* 杈撳叆妗嗭細鍦嗚鏌斿拰 */
+.input, select.input, textarea.input {
+  border-radius: 10px;
+  background: rgba(255,255,255,0.8);
+}
+.input:focus { box-shadow: 0 0 0 4px rgba(106, 140, 255, 0.18); }
+
+/* 鎸夐挳锛氭洿澶у渾瑙?+ 娓愬彉 */
+.btn { border-radius: 12px; font-weight: 500; }
+.btn-primary {
+  background: linear-gradient(135deg, #5b8cff 0%, #7c5cff 100%);
+  box-shadow: 0 6px 18px rgba(91, 140, 255, 0.35);
+}
+.btn-primary:hover { filter: brightness(1.05); }
+.btn-danger { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+
+/* 琛ㄦ牸瀹瑰櫒锛氱幓鐠?*/
+.table-wrap, .data { border-radius: 12px; }
+.data thead th { background: rgba(255,255,255,0.5); }
+
+/* Modal锛氱幓鐠?*/
+.modal-body, .modal-header, .modal-footer {
+  background: rgba(255,255,255,0.85);
+  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(28px);
+}
+
+/* Toast锛氱幓鐠?*/
+.toast { background: rgba(255,255,255,0.82) !important; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+
+/* 绉诲姩绔簳閮ㄦ爮锛氱幓鐠?*/
+@media (max-width: 900px) {
+  .sidebar { background: rgba(255,255,255,0.8) !important; color: var(--text) !important; }
+  .nav-item { color: var(--text-muted); }
+  .nav-item.active { color: var(--primary) !important; }
+}
+
+/* 缁熶竴鍝佺墝 Logo 鍥?*/
+.login-logo, .brand-logo {
+  background: url("./assets/logo.png") no-repeat center/cover, var(--primary);
+  box-shadow: 0 8px 20px rgba(91,140,255,0.35);
+}
+
+
+/* 移动端保险：竖屏窄屏一律底部 Tab */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+  .app-root { flex-direction: column !important; }
+  .sidebar { position: fixed !important; left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important; width: 100% !important; height: auto !important; flex-direction: row !important; }
+  .sidebar .brand, .sidebar-footer { display: none !important; }
+  .nav { flex-direction: row !important; height: 56px !important; }
+  .nav-item { flex: 1 !important; flex-direction: column !important; font-size: 11px !important; }
+  .main { padding-bottom: 56px !important; }
+}
+
+/* ============ 独立移动端底部导航（不再改桌面侧边栏） ============ */
+.mobile-nav { display: none; }
+
+@media (max-width: 768px) {
+  /* 桌面侧边栏完全隐藏 */
+  .sidebar { display: none !important; }
+  .app-root { flex-direction: column; }
+
+  /* 移动端底部 Tab 独立结构 */
+  .mobile-nav {
+    display: flex;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    height: 60px;
+    background: rgba(255,255,255,0.85);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.06);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .mnav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; background: none; border: none; cursor: pointer;
+    color: #8a94a6; font-size: 11px; font-family: inherit;
+  }
+  .mnav-ico { font-size: 20px; line-height: 1; }
+  .mnav-item.active { color: var(--primary); font-weight: 600; }
+
+  .main { padding-bottom: 60px; }
+  .topbar { padding: 10px 14px; }
+  .view { padding: 14px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar .input, .toolbar select { width: 100%; min-width: 0; }
+  .toolbar .spacer { display: none; }
+  .table-wrap { overflow-x: auto; }
+  .data { min-width: 600px; }
+  .toast-root { left: 12px; right: 12px; bottom: 76px; top: auto; }
+  .form-row { flex-direction: column; gap: 0; }
+}

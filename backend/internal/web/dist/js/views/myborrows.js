@@ -52,6 +52,28 @@ export async function renderMyBorrows(container) {
     loading(tableEl);
     const recs = mode === "active" ? await api.myActive() : await api.myHistory();
     tableEl.innerHTML = "";
+
+    // 顶部到期提醒：3 天内应还且未逾期的图书。
+    let banner = wrap.querySelector(".due-banner");
+    if (banner) banner.remove();
+    if (mode === "active") {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const warn = recs.filter((r) => {
+        if (r.status !== "borrowed" || !r.dueDate) return false;
+        if (r.state && r.state.includes("逾期")) return false;
+        const due = new Date(r.dueDate); due.setHours(0,0,0,0);
+        const diff = (due - today) / 86400000;
+        return diff >= 0 && diff <= 3;
+      });
+      if (warn.length) {
+        const b = document.createElement("div");
+        b.className = "due-banner";
+        b.innerHTML = `<strong>温馨提醒：</strong>以下 ${warn.length} 本图书将在 3 天内到期，请及时归还或续借：
+          ${warn.map((r) => `「${r.title}」（应还 ${r.dueDate}）`).join("、")}`;
+        wrap.insertBefore(b, tableEl);
+      }
+    }
+
     renderTable(tableEl, mode === "active" ? columnsActive : columnsHistory, recs);
     tableEl.querySelectorAll(".act-renew").forEach((b) =>
       b.addEventListener("click", async () => {

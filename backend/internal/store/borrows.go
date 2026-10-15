@@ -215,3 +215,35 @@ func (s *Store) RecentLogs(limit int) ([]models.OperationLog, error) {
 	}
 	return out, rows.Err()
 }
+
+// BorrowTrend 返回近 N 天每日新增借阅数（按 borrow_date 的日期部分分组）。
+func (s *Store) BorrowTrend(days int) ([]map[string]any, error) {
+	rows, err := s.db.Query(
+		`SELECT substr(borrow_date,1,10) d, COUNT(*) FROM borrow_records
+		 WHERE substr(borrow_date,1,10) >= date('now', ?)
+		 GROUP BY d ORDER BY d`, "-"+itoa(days-1)+" days")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []map[string]any{}
+	for rows.Next() {
+		var d string
+		var c int
+		if err := rows.Scan(&d, &c); err != nil {
+			return nil, err
+		}
+		out = append(out, map[string]any{"date": d, "count": c})
+	}
+	return out, rows.Err()
+}
+
+func itoa(n int) string {
+	if n == 0 { return "0" }
+	neg := n < 0
+	if neg { n = -n }
+	b := []byte{}
+	for n > 0 { b = append([]byte{byte('0' + n%10)}, b...); n /= 10 }
+	if neg { b = append([]byte{'-'}, b...) }
+	return string(b)
+}

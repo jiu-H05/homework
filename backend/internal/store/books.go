@@ -168,6 +168,41 @@ func (s *Store) IncAvailable(id int64) error {
 	return err
 }
 
+// FTSSearch 用 FTS5 做全文检索，按相关性排序。FTS 不可用时回退 LIKE。
+func (s *Store) FTSSearch(keyword string) ([]models.Book, error) {
+	rows, err := s.db.Query(bookSelect+`
+	JOIN books_fts f ON f.rowid = b.id WHERE books_fts MATCH ? ORDER BY rank`,
+		ftsQuery(keyword))
+	if err != nil {
+		// 回退 LIKE
+		return s.ListBooks(keyword, nil, "")
+	}
+	defer rows.Close()
+	out := []models.Book{}
+	for rows.Next() {
+		b, err := scanBook(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, b)
+	}
+	return out, rows.Err()
+}
+
+// ftsQuery 把用户输入转成 FTS5 MATCH 表达式：按 AND 分词，中文按子串匹配。
+func ftsQuery(kw string) string {
+	kw = strings.TrimSpace(kw)
+	if kw == "" {
+		return ""
+	}
+	// 简单分词：按空格拆词，每个词加 * 前缀匹配，词之间 AND。
+	parts := strings.Fields(kw)
+	for i, p := range parts {
+		parts[i] = `"` + strings.Trim(p, `"`) + `"*`
+	}
+	return strings.Join(parts, " AND ")
+}
+
 // ListRegions 按种子地区顺序返回各地区的馆藏种类数。
 func (s *Store) ListRegions() ([]models.Region, error) {
 	rows, err := s.db.Query("SELECT region, COUNT(*) FROM books GROUP BY region")

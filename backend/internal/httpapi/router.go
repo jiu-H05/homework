@@ -20,19 +20,21 @@ const actorKey ctxKey = "actor"
 
 // Server HTTP API 服务器。
 type Server struct {
-	svc    *service.Service
-	secret []byte
+	svc     *service.Service
+	secret  []byte
+	limiter *loginLimiter
 }
 
 // New 创建 API 服务器。
 func New(svc *service.Service, secret []byte) *Server {
-	return &Server{svc: svc, secret: secret}
+	return &Server{svc: svc, secret: secret, limiter: newLoginLimiter()}
 }
 
 // publicPaths 无需登录即可访问的接口。
 var publicPaths = map[string]bool{
 	"POST /api/auth/login":    true,
 	"POST /api/auth/register": true,
+	"POST /api/auth/refresh":  true,
 }
 
 // Handler 组装路由并套用中间件。
@@ -42,6 +44,7 @@ func (s *Server) Handler() http.Handler {
 	// 认证
 	mux.HandleFunc("POST /api/auth/login", s.login)
 	mux.HandleFunc("POST /api/auth/register", s.register)
+	mux.HandleFunc("POST /api/auth/refresh", s.refresh)
 	mux.HandleFunc("GET /api/auth/me", s.me)
 	mux.HandleFunc("POST /api/auth/password", s.changePassword)
 
@@ -50,6 +53,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/categories", s.addCategory)
 	mux.HandleFunc("GET /api/regions", s.listRegions)
 	mux.HandleFunc("GET /api/books", s.listBooks)
+	mux.HandleFunc("GET /api/books/search", s.searchBooks)
 	mux.HandleFunc("POST /api/books", s.createBook)
 	mux.HandleFunc("PUT /api/books/{id}", s.updateBook)
 	mux.HandleFunc("DELETE /api/books/{id}", s.deleteBook)
@@ -77,6 +81,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/stats/dashboard", s.dashboard)
 	mux.HandleFunc("GET /api/stats/categories", s.categoryStats)
 	mux.HandleFunc("GET /api/stats/hot-books", s.hotBooks)
+	mux.HandleFunc("GET /api/stats/borrow-trend", s.borrowTrend)
 	mux.HandleFunc("GET /api/logs", s.recentLogs)
 
 	// 管理员备份 / 恢复（应用内导入导出）

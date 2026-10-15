@@ -1,5 +1,7 @@
 // app.js — 应用引导与外壳：等待后端、恢复登录态、构建导航、路由视图。
 // 采用动态导入逐个加载模块，便于定位加载/评估失败的具体模块。
+// 启动时恢复暗色主题偏好（在模块加载前，避免闪白）。
+if (localStorage.getItem("lms_dark") === "1") document.body.classList.add("dark");
 const bootP = () => document.getElementById("boot").querySelector("p");
 const MOD = {};
 async function load(label, path) {
@@ -14,6 +16,7 @@ async function loadAll() {
   const steps = [
     ["api", "./api.js"],
     ["net", "./net.js"],
+    ["setup", "./setup.js"],
     ["components", "./components.js"],
     ["login", "./login.js"],
     ["dashboard", "./views/dashboard.js"],
@@ -30,13 +33,14 @@ async function loadAll() {
     await load(name, path);
   }
 }
-let api, setToken, getToken;
+let api, setToken, getToken, setRefreshToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl;
 let lmsFetch, renderLogin, openModal, toast, formValues;
 let renderDashboard, renderBooks, renderReaders, renderBorrows, renderLogs;
-let renderCatalog, renderMyBorrows, renderProfile;
+let renderCatalog, renderMyBorrows, renderProfile, renderServerSetup;
 function wireRefs() {
-  ({ api, setToken, getToken, API_BASE } = MOD.api);
+  ({ api, setToken, getToken, setRefreshToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl } = MOD.api);
   ({ lmsFetch } = MOD.net);
+  ({ renderServerSetup } = MOD.setup);
   ({ renderLogin } = MOD.login);
   ({ openModal, toast, formValues } = MOD.components);
   renderDashboard = MOD.dashboard.renderDashboard;
@@ -68,9 +72,9 @@ let currentUser = null;
 let currentNav = null;
 
 async function waitForBackend() {
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 10; i++) {
     try {
-      const r = await lmsFetch(API_BASE + "/api/health");
+      const r = await lmsFetch(getBase() + "/api/health");
       if (r.ok) return true;
       document.getElementById("boot").querySelector("p").textContent =
         `health status ${r.status}（重试中）`;
@@ -80,7 +84,25 @@ async function waitForBackend() {
       await new Promise((r) => setTimeout(r, 500));
     }
   }
+  showServerSetupOnBoot();
   return false;
+}
+
+function showServerSetupOnBoot() {
+  const boot = document.getElementById("boot");
+  boot.innerHTML = `
+    <div style="max-width:420px;text-align:center;padding:20px">
+      <p style="margin-bottom:12px">连不上服务器，请填写后端地址</p>
+      <input id="boot-url" class="input" placeholder="https://xxx.trycloudflare.com" style="margin-bottom:12px" />
+      <button id="boot-save" class="btn btn-primary btn-block">连接</button>
+    </div>`;
+  document.getElementById("boot-save").onclick = async () => {
+    const url = document.getElementById("boot-url").value.trim();
+    if (!url) return;
+    setServerUrl(url);
+    const ok = await waitForBackend();
+    if (ok) { if (getToken()) await enterApp(); else showLogin(); }
+  };
 }
 
 function showLogin() {
@@ -89,8 +111,8 @@ function showLogin() {
   const lr = document.getElementById("login-root");
   lr.classList.remove("hidden");
   renderLogin(async (data) => {
-    // 必须先保存登录返回的令牌，后续 /api/auth/me 等请求才会带 Authorization。
     setToken(data.token);
+    if (data.refreshToken) setRefreshToken(data.refreshToken);
     await enterApp();
   });
 }
@@ -107,6 +129,10 @@ async function enterApp() {
   document.getElementById("login-root").classList.add("hidden");
   document.getElementById("app-root").classList.remove("hidden");
   buildShell();
+  // 后台预热共享数据（分类/地区/全量图书），后续进页面零请求
+  api.listCategories().catch(() => {});
+  api.listRegions().catch(() => {});
+  api.listBooks({}).catch(() => {});
   const items = NAV[currentUser.role] || [];
   route(items[0].id);
 }
@@ -126,10 +152,41 @@ function buildShell() {
     b.addEventListener("click", () => route(b.dataset.id))
   );
 
+  // 移动端底部 Tab：独立一套结构，图标在上、文字在下
+  const mNav = document.getElementById("mobile-nav");
+  mNav.innerHTML = items
+    .map(
+      (it) => `
+    <button class="mnav-item" data-id="${it.id}" type="button">
+      <span class="mnav-ico">${it.ico}</span><span class="mnav-label">${it.title}</span>
+    </button>`
+    )
+    .join("");
+  mNav.querySelectorAll(".mnav-item").forEach((b) =>
+    b.addEventListener("click", () => route(b.dataset.id))
+  );
+
   const roleText = currentUser.role === "admin" ? "管理员" : "读者";
   document.getElementById("user-chip").innerHTML = `
     <span class="uc-name">${currentUser.realName || currentUser.username}</span>
     <span class="uc-role">${roleText} · ${currentUser.username}</span>`;
+
+  // 顶栏加暗色切换按钮
+  const actions = document.querySelector(".topbar-actions");
+  let btnTheme = document.getElementById("btn-theme");
+  if (!btnTheme) {
+    btnTheme = document.createElement("button");
+    btnTheme.id = "btn-theme";
+    btnTheme.className = "btn btn-ghost";
+    btnTheme.type = "button";
+    actions.insertBefore(btnTheme, actions.firstChild);
+  }
+  btnTheme.textContent = document.body.classList.contains("dark") ? "☀ 浅色" : "🌙 深色";
+  btnTheme.onclick = () => {
+    const dark = document.body.classList.toggle("dark");
+    localStorage.setItem("lms_dark", dark ? "1" : "0");
+    btnTheme.textContent = dark ? "☀ 浅色" : "🌙 深色";
+  };
 }
 
 async function route(id) {
@@ -138,6 +195,9 @@ async function route(id) {
   if (!item) return;
   currentNav = id;
   document.querySelectorAll(".nav-item").forEach((b) =>
+    b.classList.toggle("active", b.dataset.id === id)
+  );
+  document.querySelectorAll(".mnav-item").forEach((b) =>
     b.classList.toggle("active", b.dataset.id === id)
   );
   document.getElementById("page-title").textContent = item.title;
@@ -186,10 +246,12 @@ function openPasswordModal() {
 function wireGlobal() {
   document.getElementById("btn-logout").addEventListener("click", () => {
     setToken(null);
+    invalidateCache("all");
     currentUser = null;
     showLogin();
   });
   document.getElementById("btn-password").addEventListener("click", openPasswordModal);
+  window.openServerSetup = () => new Promise((done) => renderServerSetup(done));
 }
 
 async function bootstrap() {
@@ -200,10 +262,14 @@ async function bootstrap() {
     return; // 失败信息已显示在启动页
   }
   wireGlobal();
+  await resolveApiBase();
+  // Tauri/移动端瘦客户端：未配置服务器地址时，先引导配置（填 Tailscale 地址）。
+  if (isTauri && !getBase()) {
+    await new Promise((done) => renderServerSetup(done));
+  }
   const ready = await waitForBackend();
   if (!ready) {
-    document.getElementById("boot").innerHTML =
-      `<p style="color:var(--danger)">后端服务未能启动，请重新打开应用。</p>`;
+    // waitForBackend 失败后已显示服务器输入框，这里不再覆盖
     return;
   }
   if (getToken()) await enterApp();
