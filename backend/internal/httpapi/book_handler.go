@@ -51,6 +51,21 @@ func (s *Server) listBooks(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, books)
 }
 
+// searchBooks FTS5 全文检索接口。
+func (s *Server) searchBooks(w http.ResponseWriter, r *http.Request) {
+	kw := r.URL.Query().Get("q")
+	if kw == "" {
+		writeJSON(w, http.StatusOK, []any{})
+		return
+	}
+	books, err := s.svc.SearchBooks(kw)
+	if err != nil {
+		fail(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, books)
+}
+
 func (s *Server) listRegions(w http.ResponseWriter, r *http.Request) {
 	regions, err := s.svc.ListRegions()
 	if err != nil {

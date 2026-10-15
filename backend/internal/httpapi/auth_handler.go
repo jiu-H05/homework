@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -11,14 +12,20 @@ type loginReq struct {
 }
 
 type loginResp struct {
-	Token    string `json:"token"`
-	Role     string `json:"role"`
-	Username string `json:"username"`
-	RealName string `json:"realName"`
-	ReaderNo string `json:"readerNo"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refreshToken"`
+	Role         string `json:"role"`
+	Username     string `json:"username"`
+	RealName     string `json:"realName"`
+	ReaderNo     string `json:"readerNo"`
 }
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
+	// 登录限流：同 IP 失败次数累计，超出则 429。
+	if !s.allowLogin(r) {
+		writeError(w, http.StatusTooManyRequests, "尝试过于频繁，请 1 分钟后再试")
+		return
+	}
 	var req loginReq
 	if err := decodeJSON(r, &req); err != nil {
 		writeError(w, http.StatusBadRequest, "请求格式错误")
@@ -26,24 +33,54 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	}
 	u, err := s.svc.Login(req.Username, req.Password)
 	if err != nil {
+		s.recordLoginFail(r)
 		fail(w, err)
 		return
 	}
-	token, err := signToken(claims{
+	access, refresh, err := issueTokens(claims{
 		UID: u.ID, Username: u.Username, Role: u.Role, RealName: u.RealName,
-		Exp: time.Now().Add(24 * time.Hour).Unix(),
 	}, s.secret)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "令牌签发失败")
 		return
 	}
-	resp := loginResp{Token: token, Role: u.Role, Username: u.Username, RealName: u.RealName}
+	s.recordLoginOK(r)
+	resp := loginResp{Token: access, RefreshToken: refresh, Role: u.Role, Username: u.Username, RealName: u.RealName}
 	if u.Role == "reader" {
 		if rd, err := s.svc.MyReader(u); err == nil {
 			resp.ReaderNo = rd.ReaderNo
 		}
 	}
 	writeJSON(w, http.StatusOK, resp)
+}
+
+// refreshReq 用 refresh token 换新 access token。
+type refreshReq struct {
+	RefreshToken string `json:"refreshToken"`
+}
+
+func (s *Server) refresh(w http.ResponseWriter, r *http.Request) {
+	var req refreshReq
+	if err := decodeJSON(r, &req); err != nil {
+		writeError(w, http.StatusBadRequest, "请求格式错误")
+		return
+	}
+	c, err := parseToken(req.RefreshToken, s.secret)
+	if err != nil || c.Type != "refresh" {
+		writeError(w, http.StatusUnauthorized, "刷新令牌无效或已过期")
+		return
+	}
+	access, newRefresh, err := issueTokens(claims{
+		UID: c.UID, Username: c.Username, Role: c.Role, RealName: c.RealName,
+	}, s.secret)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "令牌签发失败")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{
+		"token":        access,
+		"refreshToken": newRefresh,
+	})
 }
 
 type registerReq struct {
@@ -98,3 +135,20 @@ func (s *Server) changePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, http.StatusOK, map[string]string{"message": "口令修改成功"})
 }
+
+// clientIP 取请求来源 IP（Cloudflare 隧道会在 X-Forwarded-For 里带真实 IP）。
+func clientIP(r *http.Request) string {
+	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+		if i := strings.Index(xff, ","); i > 0 {
+			return strings.TrimSpace(xff[:i])
+		}
+		return strings.TrimSpace(xff)
+	}
+	host := r.RemoteAddr
+	if i := strings.LastIndex(host, ":"); i > 0 {
+		host = host[:i]
+	}
+	return strings.TrimPrefix(host, "[")
+}
+
+var _ = time.Now // 保留 import

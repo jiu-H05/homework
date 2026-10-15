@@ -25,3 +25,8 @@ func (s *Service) HotBooks() ([]models.HotBook, error) {
 func (s *Service) RecentLogs() ([]models.OperationLog, error) {
 	return s.repo.RecentLogs(100)
 }
+
+// BorrowTrend 返回近 30 天每日借阅趋势。
+func (s *Service) BorrowTrend() ([]map[string]any, error) {
+	return s.repo.BorrowTrend(30)
+}

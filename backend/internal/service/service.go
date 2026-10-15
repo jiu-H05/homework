@@ -37,6 +37,7 @@ type Repo interface {
 	// 图书
 	ListRegions() ([]models.Region, error)
 	ListBooks(string, *int64, string) ([]models.Book, error)
+	FTSSearch(string) ([]models.Book, error)
 	GetBook(int64) (*models.Book, error)
 	CreateBook(*models.Book) error
 	UpdateBook(*models.Book) error
@@ -59,6 +60,7 @@ type Repo interface {
 	CategoryStats() ([]models.CategoryStat, error)
 	HotBooks(int) ([]models.HotBook, error)
 	RecentLogs(int) ([]models.OperationLog, error)
+	BorrowTrend(int) ([]map[string]any, error)
 	// 备份与恢复
 	BackupToFile(dest string) error
 	RestoreFromFile(src string) error

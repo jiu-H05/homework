@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -45,6 +46,13 @@ func (s *Store) open() error {
 	if _, err := db.Exec(schema); err != nil {
 		_ = db.Close()
 		return fmt.Errorf("建表失败: %w", err)
+	}
+	if _, err := db.Exec(ftsSchema); err != nil {
+		// FTS5 不可用时不阻塞启动，退化为 LIKE 查询。
+		log.Printf("FTS5 初始化失败，退化为 LIKE: %v", err)
+	} else {
+		// 首跑或恢复后同步一次已有数据到虚表。
+		_, _ = db.Exec("INSERT INTO books_fts(books_fts) VALUES('rebuild')")
 	}
 	if err := ensureColumn(db, "books", "region", "TEXT"); err != nil {
 		_ = db.Close()
@@ -217,4 +225,26 @@ CREATE TABLE IF NOT EXISTS operation_logs (
     detail TEXT,
     created_at TEXT NOT NULL
 );
+`
+
+// ftsSchema 建图书全文检索虚表（FTS5）与同步触发器。
+const ftsSchema = `
+CREATE VIRTUAL TABLE IF NOT EXISTS books_fts USING fts5(
+	title, author, isbn, publisher,
+	content='books', content_rowid='id'
+);
+CREATE TRIGGER IF NOT EXISTS books_fts_ai AFTER INSERT ON books BEGIN
+	INSERT INTO books_fts(rowid, title, author, isbn, publisher)
+	VALUES (new.id, new.title, new.author, new.isbn, new.publisher);
+END;
+CREATE TRIGGER IF NOT EXISTS books_fts_ad AFTER DELETE ON books BEGIN
+	INSERT INTO books_fts(books_fts, rowid, title, author, isbn, publisher)
+	VALUES ('delete', old.id, old.title, old.author, old.isbn, old.publisher);
+END;
+CREATE TRIGGER IF NOT EXISTS books_fts_au AFTER UPDATE ON books BEGIN
+	INSERT INTO books_fts(books_fts, rowid, title, author, isbn, publisher)
+	VALUES ('delete', old.id, old.title, old.author, old.isbn, old.publisher);
+	INSERT INTO books_fts(rowid, title, author, isbn, publisher)
+	VALUES (new.id, new.title, new.author, new.isbn, new.publisher);
+END;
 `

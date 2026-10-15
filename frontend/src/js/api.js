@@ -46,6 +46,7 @@ export async function testConnection(url) {
   return true;
 }
 const TOKEN_KEY = "lms_token";
+const REFRESH_KEY = "lms_refresh";
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -60,6 +61,33 @@ export function getToken() {
 export function setToken(token) {
   if (token) localStorage.setItem(TOKEN_KEY, token);
   else localStorage.removeItem(TOKEN_KEY);
+}
+export function getRefreshToken() {
+  return localStorage.getItem(REFRESH_KEY);
+}
+export function setRefreshToken(t) {
+  if (t) localStorage.setItem(REFRESH_KEY, t);
+  else localStorage.removeItem(REFRESH_KEY);
+}
+
+// refreshAccessToken：用 refresh token 换新 access token；失败则清空登录态。
+async function refreshAccessToken() {
+  const rt = getRefreshToken();
+  if (!rt) return false;
+  try {
+    const res = await lmsFetch(base + "/api/auth/refresh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: rt }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    setToken(data.token);
+    setRefreshToken(data.refreshToken);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function request(method, path, body, _retried) {
@@ -76,12 +104,20 @@ async function request(method, path, body, _retried) {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch (e) {
-    // 连接失败多为网络切换或服务地址变更，重新读取一次配置再重试一次。
     if (!_retried) {
       await resolveApiBase();
       return request(method, path, body, true);
     }
     throw new ApiError("无法连接到服务器，请检查网络或服务器地址", 0);
+  }
+
+  // 401 且不是刷新/登录接口，尝试用 refresh token 静默续期一次。
+  if (res.status === 401 && !_retried &&
+      path !== "/api/auth/login" && path !== "/api/auth/refresh") {
+    const ok = await refreshAccessToken();
+    if (ok) return request(method, path, body, true);
+    // 刷新失败：清空登录态，触发上层跳登录。
+    setToken(null); setRefreshToken(null);
   }
 
   let data = null;
@@ -233,6 +269,7 @@ export const api = {
   dashboard: () => get("/api/stats/dashboard"),
   categoryStats: () => get("/api/stats/categories"),
   hotBooks: () => get("/api/stats/hot-books"),
+  borrowTrend: () => get("/api/stats/borrow-trend"),
   logs: () => get("/api/logs"),
 };
 

@@ -12,6 +12,11 @@ func (s *Service) ListBooks(keyword string, categoryID *int64, region string) ([
 	return s.repo.ListBooks(strings.TrimSpace(keyword), categoryID, strings.TrimSpace(region))
 }
 
+// SearchBooks 全文检索（FTS5），无 FTS 时回退 LIKE。
+func (s *Service) SearchBooks(keyword string) ([]models.Book, error) {
+	return s.repo.FTSSearch(strings.TrimSpace(keyword))
+}
+
 // ListRegions 返回各地区及其馆藏种类数。
 func (s *Service) ListRegions() ([]models.Region, error) {
 	return s.repo.ListRegions()

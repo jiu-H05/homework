@@ -1,5 +1,7 @@
 // app.js — 应用引导与外壳：等待后端、恢复登录态、构建导航、路由视图。
 // 采用动态导入逐个加载模块，便于定位加载/评估失败的具体模块。
+// 启动时恢复暗色主题偏好（在模块加载前，避免闪白）。
+if (localStorage.getItem("lms_dark") === "1") document.body.classList.add("dark");
 const bootP = () => document.getElementById("boot").querySelector("p");
 const MOD = {};
 async function load(label, path) {
@@ -31,12 +33,12 @@ async function loadAll() {
     await load(name, path);
   }
 }
-let api, setToken, getToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl;
+let api, setToken, getToken, setRefreshToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl;
 let lmsFetch, renderLogin, openModal, toast, formValues;
 let renderDashboard, renderBooks, renderReaders, renderBorrows, renderLogs;
 let renderCatalog, renderMyBorrows, renderProfile, renderServerSetup;
 function wireRefs() {
-  ({ api, setToken, getToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl } = MOD.api);
+  ({ api, setToken, getToken, setRefreshToken, getBase, resolveApiBase, isTauri, invalidateCache, setServerUrl } = MOD.api);
   ({ lmsFetch } = MOD.net);
   ({ renderServerSetup } = MOD.setup);
   ({ renderLogin } = MOD.login);
@@ -109,8 +111,8 @@ function showLogin() {
   const lr = document.getElementById("login-root");
   lr.classList.remove("hidden");
   renderLogin(async (data) => {
-    // 必须先保存登录返回的令牌，后续 /api/auth/me 等请求才会带 Authorization。
     setToken(data.token);
+    if (data.refreshToken) setRefreshToken(data.refreshToken);
     await enterApp();
   });
 }
@@ -168,6 +170,23 @@ function buildShell() {
   document.getElementById("user-chip").innerHTML = `
     <span class="uc-name">${currentUser.realName || currentUser.username}</span>
     <span class="uc-role">${roleText} · ${currentUser.username}</span>`;
+
+  // 顶栏加暗色切换按钮
+  const actions = document.querySelector(".topbar-actions");
+  let btnTheme = document.getElementById("btn-theme");
+  if (!btnTheme) {
+    btnTheme = document.createElement("button");
+    btnTheme.id = "btn-theme";
+    btnTheme.className = "btn btn-ghost";
+    btnTheme.type = "button";
+    actions.insertBefore(btnTheme, actions.firstChild);
+  }
+  btnTheme.textContent = document.body.classList.contains("dark") ? "☀ 浅色" : "🌙 深色";
+  btnTheme.onclick = () => {
+    const dark = document.body.classList.toggle("dark");
+    localStorage.setItem("lms_dark", dark ? "1" : "0");
+    btnTheme.textContent = dark ? "☀ 浅色" : "🌙 深色";
+  };
 }
 
 async function route(id) {

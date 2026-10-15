@@ -49,3 +49,15 @@ func (s *Server) recentLogs(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, http.StatusOK, logs)
 }
+
+func (s *Server) borrowTrend(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requireAdmin(w, r); !ok {
+		return
+	}
+	trend, err := s.svc.BorrowTrend()
+	if err != nil {
+		fail(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, trend)
+}

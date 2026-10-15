@@ -16,6 +16,49 @@
   font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", Helvetica, Arial, sans-serif;
 }
 
+/* 暗色主题：body.dark 时整体反相 */
+body.dark {
+  --bg: #0f1419;
+  --surface: #1a2029;
+  --sidebar-bg: #0a1526;
+  --sidebar-active: #16294a;
+  --primary: #4a9fd8;
+  --primary-dark: #3a8bc2;
+  --text: #e4e8ee;
+  --text-muted: #8b96a5;
+  --border: #2a323d;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* 到期提醒黄条 */
+.due-banner {
+  background: #fff7e0;
+  border: 1px solid #f0d080;
+  border-left: 4px solid var(--warning);
+  color: #7a5510;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+body.dark .due-banner {
+  background: #2a2410;
+  border-color: #6b5520;
+  color: #f0d080;
+}
+
+/* 饼图与趋势图 */
+.pie-wrap { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.pie {
+  width: 160px; height: 160px; border-radius: 50%;
+  flex-shrink: 0; box-shadow: var(--shadow);
+}
+.pie-legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.pie-legend-item { display: flex; align-items: center; gap: 6px; }
+.pie-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.trend-svg { width: 100%; height: auto; }
+
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body { background: var(--bg); color: var(--text); font-size: 14px; }
