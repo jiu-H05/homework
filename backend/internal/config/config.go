@@ -3,7 +3,7 @@ package config
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 )
 
 // Config 保存后端运行参数。
@@ -16,7 +16,7 @@ type Config struct {
 // appDir 返回可执行文件（或开发时项目）所在目录，保证数据库与程序同目录、便于便携。
 func appDir() string {
 	if exe, err := os.Executable(); err == nil {
-		return path.Dir(exe)
+		return filepath.Dir(exe)
 	}
 	return "."
 }
@@ -30,7 +30,7 @@ func Load() *Config {
 	}
 	dbPath := os.Getenv("LMS_DB")
 	if dbPath == "" {
-		dbPath = path.Join(appDir(), "library_data.db")
+		dbPath = filepath.Join(appDir(), "library_data.db")
 	}
 	secret := os.Getenv("LMS_SECRET")
 	if secret == "" {
