@@ -30,7 +30,19 @@ func Load() *Config {
 	}
 	dbPath := os.Getenv("LMS_DB")
 	if dbPath == "" {
-		dbPath = filepath.Join(appDir(), "library_data.db")
+		// 优先找 exe 上级目录的 standalone/library_data.db（部署结构：tools/ 与 standalone/ 同级）。
+		// 找不到才退化到 exe 同目录（便携模式或 go run 开发场景）。
+		if exe, err := os.Executable(); err == nil {
+			candidate := filepath.Join(filepath.Dir(exe), "..", "standalone", "library_data.db")
+			if abs, err := filepath.Abs(candidate); err == nil {
+				if _, err := os.Stat(abs); err == nil {
+					dbPath = abs
+				}
+			}
+		}
+		if dbPath == "" {
+			dbPath = filepath.Join(appDir(), "library_data.db")
+		}
 	}
 	secret := os.Getenv("LMS_SECRET")
 	if secret == "" {
