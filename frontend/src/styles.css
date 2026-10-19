@@ -408,3 +408,69 @@ body {
   .toast-root { left: 12px; right: 12px; bottom: 76px; top: auto; }
   .form-row { flex-direction: column; gap: 0; }
 }
+
+/* ============ 暗色模式覆盖（Apple Glass 硬编码白色） ============ */
+body.dark {
+  --glass: rgba(26, 32, 41, 0.75);
+  --glass-strong: rgba(26, 32, 41, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+body.dark body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(40, 60, 100, 0.3) 0%, transparent 60%),
+    radial-gradient(1000px 500px at 110% 10%, rgba(80, 40, 80, 0.25) 0%, transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(30, 60, 50, 0.25) 0%, transparent 60%),
+    linear-gradient(160deg, #0f1419 0%, #141a22 100%) !important;
+  background-attachment: fixed !important;
+}
+body.dark .card, body.dark .stat-card {
+  background: rgba(26, 32, 41, 0.75) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+body.dark .topbar {
+  background: rgba(20, 26, 34, 0.88) !important;
+  border-bottom-color: rgba(255,255,255,0.08) !important;
+}
+body.dark .sidebar {
+  background: rgba(10, 18, 32, 0.85) !important;
+}
+body.dark .input, body.dark select.input, body.dark textarea.input {
+  background: rgba(255,255,255,0.08) !important;
+  color: var(--text);
+}
+body.dark .table-wrap, body.dark .data thead th {
+  background: rgba(255,255,255,0.05) !important;
+}
+body.dark .data thead th { color: var(--text); }
+body.dark .data td { border-bottom-color: rgba(255,255,255,0.06); }
+body.dark .data tr:hover td { background: rgba(255,255,255,0.04); }
+body.dark .modal-body, body.dark .modal-header, body.dark .modal-footer {
+  background: rgba(22, 28, 36, 0.95) !important;
+  color: var(--text);
+}
+body.dark .toast {
+  background: rgba(22, 28, 36, 0.92) !important;
+  color: var(--text);
+}
+body.dark .login-card {
+  background: rgba(22, 28, 36, 0.85) !important;
+}
+body.dark .btn-outline {
+  background: rgba(255,255,255,0.08);
+  color: var(--primary);
+}
+body.dark .btn-outline:hover { background: rgba(255,255,255,0.12); }
+body.dark .ico-blue { background: rgba(74, 159, 216, 0.18); }
+body.dark .ico-green { background: rgba(31, 157, 107, 0.18); }
+body.dark .ico-orange { background: rgba(217, 138, 31, 0.18); }
+body.dark .ico-red { background: rgba(214, 69, 69, 0.18); }
+body.dark .badge-blue { background: rgba(74, 159, 216, 0.18); }
+body.dark .badge-green { background: rgba(31, 157, 107, 0.18); }
+body.dark .badge-orange { background: rgba(217, 138, 31, 0.18); }
+body.dark .badge-red { background: rgba(214, 69, 69, 0.18); }
+body.dark .badge-gray { background: rgba(255,255,255,0.1); color: var(--text-muted); }
+body.dark .bar-track { background: rgba(255,255,255,0.1); }
+body.dark .mobile-nav {
+  background: rgba(20, 26, 34, 0.9) !important;
+  border-top-color: rgba(255,255,255,0.08);
+}
