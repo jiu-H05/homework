@@ -41,3 +41,33 @@ tools/pb_*.json
 tools/sync_*.json
 tools/push_backend.json
 tools/local_inventory.json
+
+# 开发/调试产物（不进仓库）
+tools/nsis/
+tools/nsis-*.zip
+tools/rustup-init.exe
+tools/goserver.exe
+tools/gnuhello/
+tools/shots/
+tools/cat_image.png
+tools/cdb_*.txt
+tools/byte_cmp.py
+tools/cand_sha.py
+tools/check_dll.py
+tools/diff_sync.py
+tools/gosum_*.py
+tools/le_check.py
+tools/load_check.py
+tools/make_inventory.py
+tools/manifest_check.py
+tools/one_sha.py
+tools/regen_batches.py
+tools/token_scan.py
+tools/sort.mjs
+tools/verify_sort.mjs
+tools/*.cs
+tools/capture_window.ps1
+tools/fix_toolchain.bat
+
+# 命名隧道真实配置（含 tunnel UUID，不入库；模板见 cloudflared-named.yml.example）
+tools/cloudflared-named.yml

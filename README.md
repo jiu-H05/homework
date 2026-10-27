@@ -99,13 +99,12 @@ cloudflared.exe tunnel --url http://localhost:8888
 
 ## 默认账号
 
-| 角色 | 账号 | 密码 |
-|---|---|---|
-| 管理员 | admin | admin123 |
-| 读者 | reader | reader123 |
+首次初始化数据库时会创建管理员 `admin` 与示例读者 `reader`（初始口令见
+`backend/internal/store/seed.go`，**仅在新建空库时生效**）。
 
-> ⚠️ **部署到公网后请立即修改默认口令**，并将 JWT 密钥写入 `tools/lms-secret.txt`（已 gitignore）。
-> 密钥轮换后所有已签发令牌立即失效，需要重新登录。
+> ⚠️ **部署到公网前必须修改初始口令**；JWT 密钥请写入 `tools/lms-secret.txt`（已 gitignore）。
+> 未配置 `LMS_SECRET` 时后端会生成一次性随机密钥，重启后已签发令牌失效。
+> 命名隧道配置请由 `tools/cloudflared-named.yml.example` 复制出 `tools/cloudflared-named.yml` 后填写。
 
 ## 注意
 

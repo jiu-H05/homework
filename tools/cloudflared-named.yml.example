@@ -1,0 +1,14 @@
+# Cloudflare Named Tunnel 配置模板
+# 用法：复制本文件为 cloudflared-named.yml（已被 .gitignore 排除），填入自己的 tunnel UUID 与凭据路径
+#   copy tools\cloudflared-named.yml.example tools\cloudflared-named.yml
+# 首次配置：
+#   cloudflared.exe tunnel login
+#   cloudflared.exe tunnel create <隧道名>
+#   cloudflared.exe tunnel route dns <隧道名> <你的域名>
+tunnel: <你的-tunnel-UUID>
+credentials-file: C:/Users/<你的用户名>/.cloudflared/<你的-tunnel-UUID>.json
+
+ingress:
+  - hostname: <你的域名，例如 lms.example.com>
+    service: http://127.0.0.1:8765
+  - service: http_status:404

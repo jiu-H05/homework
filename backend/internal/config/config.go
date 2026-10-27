@@ -2,6 +2,9 @@
 package config
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -46,7 +49,14 @@ func Load() *Config {
 	}
 	secret := os.Getenv("LMS_SECRET")
 	if secret == "" {
-		secret = "REDACTED"
+		// 未配置密钥时随机生成（每次启动不同，重启后已签发令牌失效），
+		// 避免使用可预测的固定默认值被用来伪造令牌。
+		buf := make([]byte, 32)
+		if _, err := rand.Read(buf); err != nil {
+			log.Fatalf("无法生成随机 JWT 密钥: %v", err)
+		}
+		secret = hex.EncodeToString(buf)
+		log.Println("[警告] 未设置 LMS_SECRET：已生成一次性随机密钥，重启后令牌失效；请通过环境变量或 tools/lms-secret.txt 固定配置")
 	}
 	return &Config{
 		Addr:        addr,
