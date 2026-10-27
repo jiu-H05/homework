@@ -9,7 +9,8 @@ cd /d "%~dp0"
 
 set LMS_ADDR=0.0.0.0:8765
 set LMS_DB=%~dp0..\standalone\library_data.db
-set LMS_SECRET=REDACTED
+rem JWT secret is read from lms-secret.txt (gitignored, not committed)
+if exist "%~dp0lms-secret.txt" ( set /p LMS_SECRET=<"%~dp0lms-secret.txt" )
 set LMS_OPEN_BROWSER=0
 
 echo [1/2] 启动本地后端...
