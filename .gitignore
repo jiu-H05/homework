@@ -28,3 +28,16 @@ tools/cargotest/
 # Rust 编译缓存
 tools/rustctest/
 
+# 密钥（绝不入库）
+tools/lms-secret.txt
+
+# 报告类文档不进仓库
+docs/*.pptx
+docs/*.docx
+docs/*.pdf
+
+# 历史会话遗留的临时 JSON 产物
+tools/pb_*.json
+tools/sync_*.json
+tools/push_backend.json
+tools/local_inventory.json
