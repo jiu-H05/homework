@@ -33,7 +33,7 @@ curl http://127.0.0.1:8080/api/health      # {"status":"ok"}
 | SSL 模式 | Cloudflare SSL/TLS → **Flexible**（源站是 HTTP:8080） |
 | Origin Rule | Rules → Origin Rules → `Hostname equals lms.<你的域名>` → **Destination Port → 8080** |
 
-> 境内地域且域名未备案时，80/443 会被拦截；用 8080 回源可规避。
+> **备案说明**：境内地域 ECS 上，域名未完成 ICP 备案时，云厂商会拦截以该域名发起的访问（**含 8080 等非标准端口**）。备案通过后自动恢复；备案期间可用 `http://<服务器IP>:8080` 直连。
 
 ## 4. 验证
 

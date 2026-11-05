@@ -80,7 +80,7 @@ curl http://127.0.0.1:8080/api/health
 2. **Cloudflare**：SSL/TLS 模式设为 **Flexible**；
    Rules → Origin Rules → `Hostname equals lms.hyx0211.xyz` → **Destination Port 重写为 8080**。
 
-> 为什么用 8080 回源：ECS 位于境内地域，未备案域名的 80/443 会被拦截；非标准端口不受此限制。
+> **备案说明**：ECS 位于境内地域，**域名未完成 ICP 备案时**，云厂商会拦截以该域名发起的访问（**含 8080 等非标准端口**，返回备案提示页）。备案通过后自动恢复；备案期间可直接用 `http://<服务器IP>:8080` 访问。
 
 ### 3. 运行客户端
 
