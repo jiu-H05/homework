@@ -76,3 +76,8 @@ tools/cloudflared-named.yml
 standalone/*.exe
 standalone/*.vbs
 standalone/*.cmd
+
+# deploy 下的构建产物与数据（不入库）
+deploy/lms-server
+deploy/library_data.db*
+deploy/lms-secret.txt

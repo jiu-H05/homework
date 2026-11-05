@@ -1,0 +1,19 @@
+[Unit]
+Description=LMS 图书管理系统后端
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/lms
+Environment=LMS_ADDR=0.0.0.0:8080
+Environment=LMS_DB=/opt/lms/library_data.db
+Environment=LMS_OPEN_BROWSER=0
+EnvironmentFile=-/opt/lms/lms.env
+ExecStart=/opt/lms/lms-server
+Restart=always
+RestartSec=3
+User=lms
+Group=lms
+
+[Install]
+WantedBy=multi-user.target
