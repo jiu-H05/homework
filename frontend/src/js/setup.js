@@ -17,9 +17,9 @@ export function renderServerSetup(onDone) {
       <p class="login-sub">请输入图书系统后端的访问地址</p>
       <div class="field">
         <label>服务器地址</label>
-        <input class="input" id="srv-url" placeholder="例如 https://example.trycloudflare.com" value="${esc(prev)}" />
+        <input class="input" id="srv-url" placeholder="https://lms.hyx0211.xyz" value="${esc(prev)}" />
       </div>
-      <p class="form-hint">公网部署填 https 地址；局域网部署填 http://服务器IP:8765。</p>
+      <p class="form-hint">公网填 https://lms.hyx0211.xyz（域名备案未通过时可用 http://8.163.81.133:8080）；局域网填 http://服务器IP:8765。</p>
       <button class="btn btn-primary btn-block" id="srv-test" type="button">测试连接并保存</button>
       <p style="margin-top:10px"><a href="javascript:void(0)" id="srv-cancel" style="color:#888">返回</a></p>
     </div>`;

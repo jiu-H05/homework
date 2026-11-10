@@ -10,7 +10,12 @@
       "identifier": "http:default",
       "allow": [
         { "url": "http://*/*" },
-        { "url": "https://*/*" }
+        { "url": "https://*/*" },
+        { "url": "http://8.163.81.133:8080/*" },
+        { "url": "http://127.0.0.1:8080/*" },
+        { "url": "http://127.0.0.1:8765/*" },
+        { "url": "http://localhost:8080/*" },
+        { "url": "http://localhost:8765/*" }
       ]
     }
   ]

@@ -11,6 +11,18 @@ const inTauri = typeof window !== "undefined" && !!window.__TAURI_INTERNALS__;
 export const isTauri = inTauri;
 let base = "";
 
+// 全新安装（本地没有保存过地址）时的候选服务器地址，按优先级自动探测：
+// 1) 正式域名（Cloudflare 提供 HTTPS）；2) 直连服务器 IP（域名备案未通过时仍可用）。
+// 用户一旦在"服务器设置"里保存过地址，就始终以用户配置为准。
+const DEFAULT_SERVERS = ["https://lms.hyx0211.xyz", "http://8.163.81.133:8080"];
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+  ]);
+}
+
 function readStored() {
   try { return localStorage.getItem(SERVER_KEY) || ""; } catch { return ""; }
 }
@@ -28,12 +40,29 @@ export function setServerUrl(u) {
 export function hasServerConfigured() { return !!base; }
 
 // resolveApiBase 启动时确定 base：浏览器同源留空；Tauri/移动端读本地配置。
+// 无历史配置时依次探测 DEFAULT_SERVERS，选第一个能连通的，实现"装完即用"。
 export async function resolveApiBase() {
   if (!inTauri) {
     base = "";
     return base;
   }
-  base = readStored();
+  const stored = readStored();
+  if (stored) {
+    base = stored;
+    return base;
+  }
+  base = DEFAULT_SERVERS[0];
+  for (const url of DEFAULT_SERVERS) {
+    try {
+      const res = await withTimeout(lmsFetch(url + "/api/health"), 4000);
+      if (res && res.ok) {
+        base = url;
+        break;
+      }
+    } catch {
+      // 该地址不可达，尝试下一个候选
+    }
+  }
   return base;
 }
 
