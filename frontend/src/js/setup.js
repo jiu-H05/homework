@@ -21,7 +21,7 @@ export function renderServerSetup(onDone) {
       </div>
       <p class="form-hint">公网填 https://lms.hyx0211.xyz（域名备案未通过时可用 http://8.163.81.133:8080）；局域网填 http://服务器IP:8765。</p>
       <button class="btn btn-primary btn-block" id="srv-test" type="button">测试连接并保存</button>
-      <p style="margin-top:10px"><a href="javascript:void(0)" id="srv-cancel" style="color:#888">返回</a></p>
+      <p style="margin-top:10px"><a href="javascript:void(0)" id="srv-cancel" style="color:var(--text-muted)">返回</a></p>
     </div>`;
 
   const input = root.querySelector("#srv-url");

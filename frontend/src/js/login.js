@@ -26,7 +26,7 @@ export function renderLogin(onSuccess) {
           <button class="btn btn-primary btn-block" type="submit">登 录</button>
         </form>
         <p class="form-hint">初始口令见部署说明；如遗忘请联系管理员重置</p>
-        <p class="form-hint" style="margin-top:6px"><a href="javascript:void(0)" id="lnk-server" style="color:#888">服务器设置…</a></p>
+        <p class="form-hint" style="margin-top:6px"><a href="javascript:void(0)" id="lnk-server" style="color:var(--text-muted)">服务器设置…</a></p>
       </div>
       <div id="register-pane" class="hidden">
         <form id="register-form">

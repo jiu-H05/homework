@@ -1,4 +1,5 @@
 ﻿:root {
+  color-scheme: light;
   --bg: #f4f6fa;
   --surface: #ffffff;
   --sidebar-bg: #10233f;
@@ -18,6 +19,7 @@
 
 /* 暗色主题：body.dark 时整体反相 */
 body.dark {
+  color-scheme: dark;
   --bg: #0f1419;
   --surface: #1a2029;
   --sidebar-bg: #0a1526;
@@ -192,7 +194,7 @@ table.data tr:hover td { background: #f8fafd; }
 /* ---------- Modal ---------- */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(16, 35, 63, 0.45); display: flex;
   align-items: center; justify-content: center; z-index: 50; padding: 20px; }
-.modal { background: #fff; border-radius: 12px; width: 560px; max-width: 100%; max-height: 90vh;
+.modal { background: var(--surface); border-radius: 12px; width: 560px; max-width: 100%; max-height: 90vh;
   display: flex; flex-direction: column; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25); }
 .modal.modal-lg { width: 720px; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px;
@@ -415,7 +417,7 @@ body.dark {
   --glass-strong: rgba(26, 32, 41, 0.88);
   --glass-border: rgba(255, 255, 255, 0.08);
 }
-body.dark body {
+body.dark {
   background:
     radial-gradient(1200px 600px at 10% -10%, rgba(40, 60, 100, 0.3) 0%, transparent 60%),
     radial-gradient(1000px 500px at 110% 10%, rgba(80, 40, 80, 0.25) 0%, transparent 55%),
@@ -473,4 +475,37 @@ body.dark .bar-track { background: rgba(255,255,255,0.1); }
 body.dark .mobile-nav {
   background: rgba(20, 26, 34, 0.9) !important;
   border-top-color: rgba(255,255,255,0.08);
+}
+
+/* 登录 / 服务器设置页：暗色下压暗渐变背景 */
+body.dark .login-root {
+  background: linear-gradient(135deg, #14203a 0%, #221830 50%, #2c1626 100%) !important;
+}
+
+/* 模态框外壳底色（header/body/footer 已有覆盖，这里补外壳） */
+body.dark .modal {
+  background: rgba(22, 28, 36, 0.95) !important;
+}
+
+/* 幽灵按钮悬停：暗色下用浅色半透明，避免黑底上不可见 */
+body.dark .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+/* 启动页加载圈：暗色下边框换成浅色半透明 */
+body.dark .boot-spinner {
+  border-color: rgba(255, 255, 255, 0.15);
+  border-top-color: var(--primary);
+}
+
+/* 登录页悬浮主题切换按钮 */
+.theme-toggle-float {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 60;
+}
+body.dark .theme-toggle-float .btn-theme {
+  color: var(--text-muted);
 }

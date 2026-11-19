@@ -2,6 +2,49 @@
 // 采用动态导入逐个加载模块，便于定位加载/评估失败的具体模块。
 // 启动时恢复暗色主题偏好（在模块加载前，避免闪白）。
 if (localStorage.getItem("lms_dark") === "1") document.body.classList.add("dark");
+document.documentElement.style.colorScheme = document.body.classList.contains("dark") ? "dark" : "light";
+
+// ---------- 主题（深色 / 浅色）----------
+const THEME_KEY = "lms_dark";
+function isDark() { return document.body.classList.contains("dark"); }
+function syncThemeButtons() {
+  const dark = isDark();
+  document.querySelectorAll(".btn-theme").forEach((b) => {
+    b.textContent = dark ? "☀ 浅色" : "🌙 深色";
+  });
+  document.documentElement.style.colorScheme = dark ? "dark" : "light";
+}
+function applyTheme(dark) {
+  document.body.classList.toggle("dark", dark);
+  try { localStorage.setItem(THEME_KEY, dark ? "1" : "0"); } catch {}
+  syncThemeButtons();
+}
+function toggleTheme() { applyTheme(!isDark()); }
+function makeThemeButton() {
+  const b = document.createElement("button");
+  b.className = "btn btn-ghost btn-theme";
+  b.type = "button";
+  b.onclick = toggleTheme;
+  return b;
+}
+// 登录 / 服务器设置页右上角悬浮切换按钮
+function mountLoginThemeToggle() {
+  let bar = document.getElementById("login-theme-bar");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "login-theme-bar";
+    bar.className = "theme-toggle-float";
+    document.body.appendChild(bar);
+  }
+  bar.style.display = "";
+  if (!bar.querySelector(".btn-theme")) bar.appendChild(makeThemeButton());
+  syncThemeButtons();
+}
+function hideLoginThemeToggle() {
+  const bar = document.getElementById("login-theme-bar");
+  if (bar) bar.style.display = "none";
+}
+
 const bootP = () => document.getElementById("boot").querySelector("p");
 const MOD = {};
 async function load(label, path) {
@@ -96,6 +139,7 @@ function showServerSetupOnBoot() {
       <input id="boot-url" class="input" placeholder="https://xxx.trycloudflare.com" style="margin-bottom:12px" />
       <button id="boot-save" class="btn btn-primary btn-block">连接</button>
     </div>`;
+  mountLoginThemeToggle();
   document.getElementById("boot-save").onclick = async () => {
     const url = document.getElementById("boot-url").value.trim();
     if (!url) return;
@@ -110,6 +154,7 @@ function showLogin() {
   document.getElementById("app-root").classList.add("hidden");
   const lr = document.getElementById("login-root");
   lr.classList.remove("hidden");
+  mountLoginThemeToggle();
   renderLogin(async (data) => {
     setToken(data.token);
     if (data.refreshToken) setRefreshToken(data.refreshToken);
@@ -128,6 +173,7 @@ async function enterApp() {
   document.getElementById("boot").classList.add("hidden");
   document.getElementById("login-root").classList.add("hidden");
   document.getElementById("app-root").classList.remove("hidden");
+  hideLoginThemeToggle();
   buildShell();
   // 后台预热共享数据（分类/地区/全量图书），后续进页面零请求
   api.listCategories().catch(() => {});
@@ -171,22 +217,15 @@ function buildShell() {
     <span class="uc-name">${currentUser.realName || currentUser.username}</span>
     <span class="uc-role">${roleText} · ${currentUser.username}</span>`;
 
-  // 顶栏加暗色切换按钮
+  // 顶栏主题切换按钮（与登录页悬浮按钮共用同一套主题逻辑）
   const actions = document.querySelector(".topbar-actions");
-  let btnTheme = document.getElementById("btn-theme");
+  let btnTheme = actions.querySelector(".btn-theme");
   if (!btnTheme) {
-    btnTheme = document.createElement("button");
+    btnTheme = makeThemeButton();
     btnTheme.id = "btn-theme";
-    btnTheme.className = "btn btn-ghost";
-    btnTheme.type = "button";
     actions.insertBefore(btnTheme, actions.firstChild);
   }
-  btnTheme.textContent = document.body.classList.contains("dark") ? "☀ 浅色" : "🌙 深色";
-  btnTheme.onclick = () => {
-    const dark = document.body.classList.toggle("dark");
-    localStorage.setItem("lms_dark", dark ? "1" : "0");
-    btnTheme.textContent = dark ? "☀ 浅色" : "🌙 深色";
-  };
+  syncThemeButtons();
 }
 
 async function route(id) {

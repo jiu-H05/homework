@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <script>
+      // 首屏渲染前恢复主题偏好，避免暗色用户先闪白底
+      (function () {
+        try {
+          if (localStorage.getItem("lms_dark") === "1") {
+            document.body.classList.add("dark");
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {}
+      })();
+    </script>
     <div id="boot" class="boot">
       <div class="boot-spinner"></div>
       <p>正在启动图书管理系统…</p>
